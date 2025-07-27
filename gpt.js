@@ -287,7 +287,7 @@ function handleCheckout() {
       msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
 
       // Open WhatsApp with message
-      window.open(`https://wa.me/919172244840?text=${encodeURIComponent(msg)}`, '_blank');
+      window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
 
       cart.length = 0;
       updateCart();
