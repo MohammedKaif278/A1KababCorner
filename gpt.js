@@ -267,32 +267,39 @@ function handleCheckout() {
   if (!cart.length) return alert('Cart is empty!');
 
   const name = prompt("Enter your name:");
+  const phone = prompt("Enter your phone number:");
   const address = prompt("Enter your delivery address:");
-  const notes = document.getElementById("orderNotes").value;
+  const notes = document.getElementById("orderNotes")?.value || '';
 
+  // Get Geolocation
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const { latitude, longitude } = position.coords;
       const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-     let msg = `🛒 *Order from A1 Kabab Corner*\n👤 ${name}\n🏠 ${address}\n📍 Location: ${locationLink}\n\n`;
+      // Compose WhatsApp message
+      let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone No:${phone}\n🏠 Address: ${address}\n📍 Location: ${locationLink}\n\n`;
 
-cart.forEach(i => {
-  msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
-});
+      cart.forEach(i => {
+        msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
+      });
 
-msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
+      msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
 
-window.open(`https://wa.me/919172244840?text=${encodeURIComponent(msg)}`, '_blank');
+      // Open WhatsApp with message
+      window.open(`https://wa.me/919172244840?text=${encodeURIComponent(msg)}`, '_blank');
 
-      cart = [];
+      cart.length = 0;
       updateCart();
       localStorage.removeItem('cart');
       alert('Thank you! Order sent via WhatsApp');
     },
-    () => alert("Location permission denied. Please enable location to proceed.")
+    (err) => {
+      alert("Location permission denied. Please enable location to proceed.");
+    }
   );
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
