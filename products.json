@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "title": "Chicken Tandoori",
+        "price": 120.0,
+        "description": "Succulent, smoky, and spice-kissed — Chicken Tandoori is a fiery feast that melts in your mouth!",
+        "category": "tandoor",
+        "image": "https://salttotastebysabina.wordpress.com/wp-content/uploads/2017/07/img_1562-1.png"
+    },
+    {
+        "id": 2,
+        "title": "Chicken Tikka Boti",
+        "price": 200.0,
+        "description": "ender, smoky, and bursting with bold spices — Tikka Boti is a grill-lovers dream!",
+        "category": "tandoor",
+        "image": "https://png.pngtree.com/png-vector/20241203/ourlarge/pngtree-barbecued-chicken-tikka-boti-png-image_14510385.png"
+    },
+    {
+        "id": 3,
+        "title": "Chicken Seekh Kabab",
+        "price": 180.0,
+        "description": "Sizzling, juicy, and loaded with desi spice — Chicken Seekh Kababs that bring the street food magic to your plate!",
+        "category": "seekh kabab",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQnHdJRwYnpJv9RdYxUSS8B3Df4jIQHDhtIg&s"
+    },
+    {
+        "id": 4,
+        "title": "Chicken Bhuna ",
+        "price": 160.0,
+        "description": "Slow-cooked chicken in a rich, thick, and spicy masala — Chicken Bhuna is pure comfort in every bite!",
+        "category": "chicken",
+        "image": "https://aromaticessence.co/wp-content/uploads/2023/11/chicken_keema_featured.jpg"
+    }
+    
+]

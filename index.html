@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A1 Kabab Corner</title>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="store-name">A1 Kabab Corner</div>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search products..." />
+      <button id="clearSearch"><i class="fas fa-times"></i></button>
+      <button id="searchBtn"><i class="fas fa-search"></i></button>
+    </div>
+    <button class="cart-btn" id="cartBtn">
+      <i class="fas fa-shopping-cart"></i>
+      <span id="cartCount">0</span>
+    </button>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <button class="filter-btn active" data-category="all">
+        <i class=""></i> All Items
+      </button>
+      <button class="filter-btn" data-category="chicken">
+        <i class=""></i> Chicken
+      </button>
+      <button class="filter-btn" data-category="tandoor">
+        <i class=""></i> Tandoor
+      </button>
+      <button class="filter-btn" data-category="seekh kabab">
+        <i class=""></i> Seekh Kabab
+      </button>
+      
+    </aside>
+
+    <main id="main"></main>
+  </div>
+
+  <!-- Overlays -->
+  <div id="detailsOverlay" class="overlay hidden">
+    <div class="overlay-content" id="detailsContent"></div>
+    <button class="close-overlay" onclick="closeOverlay('detailsOverlay')">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div id="cartOverlay" class="overlay hidden">
+    <div class="overlay-content" id="cartContent">
+      <h2><i class="fas fa-shopping-cart"></i> Your Cart</h2>
+      <div id="cartItems"></div>
+<textarea id="orderNotes" placeholder="Any order notes?" aria-label="Order notes"></textarea>
+<div class="cart-total">
+  <p>Total: ₹<span id="cartTotal">0.00</span></p>
+  <button class="checkout-btn">Proceed to Checkout</button>
+</div>
+    </div>
+    <button class="close-overlay" onclick="closeOverlay('cartOverlay')">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <footer class="footer">
+    <p>© A1 Kabab Corner 2025 | All Rights Reserved</p>
+    <div class="social-icons">
+      <!-- <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a> -->
+    </div>
+  </footer>
+
+  <script src="./gpt.js"></script>
+</body>
+</html>
