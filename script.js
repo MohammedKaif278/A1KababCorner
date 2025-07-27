@@ -272,16 +272,15 @@ function handleCheckout() {
   const notes = document.getElementById("orderNotes")?.value || '';
 
   if (!name || !phone || !address) {
-    alert("Name, phone number, and address are required!");
+    alert("Please fill in all details.");
     return;
   }
 
-  // Create Google Maps search link from address
-  const addressEncoded = encodeURIComponent(address);
-  const locationLink = `https://www.google.com/maps/search/?api=1&query=${addressEncoded}`;
+  // Convert address to Google Maps search link
+  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   // Compose WhatsApp message
-  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Location: ${locationLink}\n\n`;
+  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Location: ${mapsLink}\n\n`;
 
   cart.forEach(i => {
     msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
@@ -289,11 +288,12 @@ function handleCheckout() {
 
   msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
 
-  // Send to WhatsApp
+  // Open WhatsApp with message
   window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
 
   cart.length = 0;
   updateCart();
   localStorage.removeItem('cart');
-  alert('Thank you! Your order was sent via WhatsApp.');
+  alert('Thank you! Order sent via WhatsApp');
 }
+
