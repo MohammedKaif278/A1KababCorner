@@ -288,7 +288,7 @@ msg += `\n📝 *Notes:* ${notes || 'None'}\n`;
 msg += `💰 *Total:* ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
 
 // Send the message (encode it only ONCE here)
-window.open(`https://wa.me/919172244840?text=${encodeURIComponent(msg)}`, '_blank');
+window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
 
       cart = [];
       updateCart();
