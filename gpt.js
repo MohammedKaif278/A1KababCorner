@@ -275,20 +275,15 @@ function handleCheckout() {
       const { latitude, longitude } = position.coords;
       const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-      let msg = `🛒 *A1 Kabab Corner Order*\n\n`;
-msg += `👤 *Name:* ${name}\n`;
-msg += `🏠 *Address:* ${address}\n`;
-msg += `📍 *Location:* ${locationLink}\n\n`;
+     let msg = `🛒 *Order from A1 Kabab Corner*\n👤 ${name}\n🏠 ${address}\n📍 Location: ${locationLink}\n\n`;
 
 cart.forEach(i => {
   msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
 });
 
-msg += `\n📝 *Notes:* ${notes || 'None'}\n`;
-msg += `💰 *Total:* ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
+msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
 
-// Send the message (encode it only ONCE here)
-window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
+window.open(`https://wa.me/919172244840?text=${encodeURIComponent(msg)}`, '_blank');
 
       cart = [];
       updateCart();
