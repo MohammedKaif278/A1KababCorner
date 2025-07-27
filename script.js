@@ -268,27 +268,23 @@ function handleCheckout() {
 
   const name = prompt("Enter your name:");
   const phone = prompt("Enter your phone number:");
-  const address = prompt("Enter your delivery address:");
+  const address = prompt("Enter your full delivery address:");
   const notes = document.getElementById("orderNotes")?.value || '';
 
-  if (!name || !phone || !address) {
-    alert("Please fill in all details.");
-    return;
-  }
+  if (!address) return alert("Address is required!");
 
-  // Convert address to Google Maps search link
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  const mapsSearchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   // Compose WhatsApp message
-  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Location: ${mapsLink}\n\n`;
+  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Location: ${mapsSearchLink}\n\n`;
 
-  cart.forEach(i => {
-    msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
+  cart.forEach(item => {
+    msg += `• ${item.title} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}\n`;
   });
 
-  msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${total.toFixed(2)}`;
 
-  // Open WhatsApp with message
   window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
 
   cart.length = 0;
