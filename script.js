@@ -1,4 +1,6 @@
- // DOM Elements
+// A1 Kabab Corner Combined Script with WhatsApp Checkout, Cart Persistence, and Accessibility
+
+// DOM Elements
 const mainDiv = document.getElementById('main');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
@@ -9,63 +11,71 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const filterBtns = document.querySelectorAll('.filter-btn');
 
-// Global variables
 let products = [];
-const cart = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// Initialize the app
 function init() {
   fetchProducts();
   setupEventListeners();
+  updateCart();
 }
 
-// Fetch products from API
 function fetchProducts() {
   fetch('products.json')
     .then(res => res.json())
     .then(data => {
-      products = data;
-      displayProducts(data);
+      products = data.filter(isValidProduct);
+      displayProducts(products);
     })
     .catch(err => console.error('Error fetching products:', err));
 }
 
-// Display products in the main area
+function isValidProduct(p) {
+  return p && p.id && p.title && p.price != null && p.image;
+}
+
 function displayProducts(productsToDisplay) {
   mainDiv.innerHTML = '';
-  
+
   if (productsToDisplay.length === 0) {
     mainDiv.innerHTML = '<div class="no-products">No products found. Try a different search.</div>';
     return;
   }
-  
+
   productsToDisplay.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product';
-    
+
+    const image = product.image || 'fallback.jpg';
+    const title = product.title || 'No title';
+    const price = product.price != null ? `₹${product.price.toFixed(2)}` : 'Price unavailable';
+
     card.innerHTML = `
-      <img src="${product.image}" alt="${product.title}" loading="lazy" />
-      <h3>${product.title}</h3>
-      <p class="price">₹${product.price.toFixed(2)}</p>
+      <img src="${image}" alt="${title}" loading="lazy" />
+      <h3>${title}</h3>
+      <p class="price">${price}</p>
       <div class="buttons">
-        <button class="details-btn" onclick="showDetails(${product.id})">
+        <button class="details-btn" onclick="showDetails(${product.id})" aria-label="View details for ${title}">
           <i class="fas fa-eye"></i> Details
         </button>
-        <button class="cart-btn" onclick="addToCart(${product.id})">
+        <button class="cart-btn" onclick="addToCart(${product.id})" aria-label="Add ${title} to cart">
           <i class="fas fa-cart-plus"></i> Add
         </button>
       </div>
     `;
-    
+
     mainDiv.appendChild(card);
   });
 }
 
-// Show product details in overlay
 function showDetails(productId) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
-  
+
+  document.title = `${product.title} | A1 Kabab Corner`;
+  setMetaTags(product);
+  injectProductJSONLD(product);
+
   const detailsDiv = document.getElementById('detailsContent');
   detailsDiv.innerHTML = `
     <div class="product-details">
@@ -81,56 +91,79 @@ function showDetails(productId) {
       </div>
     </div>
   `;
-  
   openOverlay('detailsOverlay');
 }
 
-// Add product to cart
+function setMetaTags(product) {
+  document.querySelector("meta[name='description']")?.remove();
+  document.querySelector("meta[name='keywords']")?.remove();
+
+  const desc = document.createElement('meta');
+  desc.name = 'description';
+  desc.content = product.description || 'Delicious items available at A1 Kabab Corner';
+  document.head.appendChild(desc);
+
+  const keywords = document.createElement('meta');
+  keywords.name = 'keywords';
+  keywords.content = `${product.title}, kabab, food, tandoori`;
+  document.head.appendChild(keywords);
+}
+
+function injectProductJSONLD(product) {
+  const existing = document.getElementById('jsonld');
+  if (existing) existing.remove();
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = 'jsonld';
+  script.textContent = JSON.stringify({
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.title,
+    image: [product.image],
+    description: product.description,
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: product.price,
+      availability: 'https://schema.org/InStock'
+    }
+  });
+  document.head.appendChild(script);
+}
+
 function addToCart(productId) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
-  
+
   const existingItem = cart.find(item => item.id === productId);
-  
   if (existingItem) {
     existingItem.quantity++;
   } else {
-    cart.push({
-      ...product,
-      quantity: 1
-    });
+    cart.push({ ...product, quantity: 1 });
   }
-  
+
   updateCart();
-  
-  // Show notification
   showNotification(`${product.title} added to cart!`);
 }
 
-// Update cart display
 function updateCart() {
-  // Update cart count
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-  cartCount.textContent = totalItems;
-  
-  // Update cart items list
+  cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
   cartItems.innerHTML = '';
-  
+
   if (cart.length === 0) {
     cartItems.innerHTML = '<p>Your cart is empty.</p>';
     cartTotal.textContent = '0.00';
     return;
   }
-  
+
   let totalPrice = 0;
-  
   cart.forEach(item => {
     const itemTotal = item.price * item.quantity;
     totalPrice += itemTotal;
-    
+
     const cartItem = document.createElement('div');
     cartItem.className = 'cart-item';
-    
     cartItem.innerHTML = `
       <img src="${item.image}" alt="${item.title}" />
       <div class="cart-item-info">
@@ -144,122 +177,114 @@ function updateCart() {
         <button onclick="removeCartItem(${item.id})"><i class="fas fa-trash"></i></button>
       </div>
     `;
-    
     cartItems.appendChild(cartItem);
   });
-  
-  // Update total price
+
   cartTotal.textContent = totalPrice.toFixed(2);
+  localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-// Update cart item quantity
 function updateCartItem(productId, action) {
-  const item = cart.find(item => item.id === productId);
+  const item = cart.find(i => i.id === productId);
   if (!item) return;
-  
-  if (action === 'increase') {
-    item.quantity++;
-  } else if (action === 'decrease' && item.quantity > 1) {
-    item.quantity--;
-  }
-  
+
+  if (action === 'increase') item.quantity++;
+  else if (action === 'decrease' && item.quantity > 1) item.quantity--;
+
   updateCart();
 }
 
-// Remove item from cart
 function removeCartItem(productId) {
-  const index = cart.findIndex(item => item.id === productId);
+  const index = cart.findIndex(i => i.id === productId);
   if (index !== -1) {
     cart.splice(index, 1);
     updateCart();
   }
 }
 
-// Open overlay
 function openOverlay(id) {
-  const overlay = document.getElementById(id);
-  overlay.classList.add('show');
+  document.getElementById(id).classList.add('show');
   document.body.style.overflow = 'hidden';
 }
 
-// Close overlay
 function closeOverlay(id) {
-  const overlay = document.getElementById(id);
-  overlay.classList.remove('show');
+  document.getElementById(id).classList.remove('show');
   document.body.style.overflow = 'auto';
 }
 
-// Show notification
-function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.className = 'notification';
-  notification.innerHTML = `
-    <i class="fas fa-check-circle"></i> ${message}
-  `;
-  
-  document.body.appendChild(notification);
-  
+function showNotification(msg) {
+  const note = document.createElement('div');
+  note.className = 'notification';
+  note.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+  document.body.appendChild(note);
+
+  setTimeout(() => note.classList.add('show'), 10);
   setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
+    note.classList.remove('show');
+    setTimeout(() => note.remove(), 300);
   }, 3000);
 }
 
-// Setup event listeners
 function setupEventListeners() {
-  // Search functionality
   searchBtn.addEventListener('click', () => {
     const query = searchInput.value.trim().toLowerCase();
-    const filtered = products.filter(p => 
-      p.title.toLowerCase().includes(query) || 
+    const filtered = products.filter(p =>
+      p.title.toLowerCase().includes(query) ||
       p.description.toLowerCase().includes(query) ||
       p.category.toLowerCase().includes(query)
     );
     displayProducts(filtered);
   });
-  
-  // Clear search
+
   clearSearch.addEventListener('click', () => {
     searchInput.value = '';
     displayProducts(products);
   });
-  
-  // Search on Enter key
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      searchBtn.click();
-    }
+
+  searchInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') searchBtn.click();
   });
-  
-  // Open cart overlay
-  cartBtn.addEventListener('click', () => {
-    openOverlay('cartOverlay');
-  });
-  
-  // Filter products by category
+
+  cartBtn.addEventListener('click', () => openOverlay('cartOverlay'));
+
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Remove active class from all buttons
       filterBtns.forEach(b => b.classList.remove('active'));
-      // Add active class to clicked button
       btn.classList.add('active');
-      
-      const category = btn.dataset.category;
-      if (category === 'all') {
-        displayProducts(products);
-      } else {
-        const filtered = products.filter(p => p.category === category);
-        displayProducts(filtered);
-      }
+      const cat = btn.dataset.category;
+      displayProducts(cat === 'all' ? products : products.filter(p => p.category === cat));
     });
   });
 }
 
-// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.checkout-btn').addEventListener('click', handleCheckout);
+});
+
+function handleCheckout() {
+  if (!cart.length) return alert('Cart is empty!');
+
+  const name = prompt("Enter your name:");
+  const phone = prompt("Enter your phone number:");
+  const address = prompt("Enter your delivery address:");
+  const notes = prompt("Any notes for the order? (Optional):") || 'None';
+
+  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
+  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Map: ${mapsLink}\n\n`;
+
+  cart.forEach(i => {
+    msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
+  });
+
+  msg += `\n📝 Notes: ${notes}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
+
+  window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
+
+  cart.length = 0;
+  updateCart();
+  localStorage.removeItem('cart');
+  alert('Thank you! Order sent via WhatsApp');
+}
