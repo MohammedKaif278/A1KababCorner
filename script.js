@@ -271,12 +271,13 @@ function handleCheckout() {
   const address = prompt("Enter your full delivery address:");
   const notes = document.getElementById("orderNotes")?.value || '';
 
-  if (!address) return alert("Address is required!");
+  if (!name || !phone || !address) {
+    alert("Please fill in all required details.");
+    return;
+  }
 
-  const mapsSearchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-
-  // Compose WhatsApp message
-  let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n📍 Location: ${mapsSearchLink}\n\n`;
+  // Compose WhatsApp message with only text — no location link
+  let msg = `🛒 A1 Kabab Corner Order\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🏠 Address: ${address}\n\n`;
 
   cart.forEach(item => {
     msg += `• ${item.title} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}\n`;
@@ -285,11 +286,15 @@ function handleCheckout() {
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${total.toFixed(2)}`;
 
-  window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
+  // Send message via WhatsApp
+  const encodedMsg = encodeURIComponent(msg);
+  const whatsappURL = `https://wa.me/918956507490?text=${encodedMsg}`;
+  window.open(whatsappURL, '_blank');
 
+  // Clear cart
   cart.length = 0;
   updateCart();
   localStorage.removeItem('cart');
-  alert('Thank you! Order sent via WhatsApp');
+  alert("Order sent via WhatsApp!");
 }
 
