@@ -45,12 +45,12 @@ body {
   font-size: 1.8rem;
   font-weight: bolder;
   letter-spacing: 1px;
-  background: linear-gradient(360deg, var(--dark));
+  background: linear-gradient( var(--light));
   
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 1px 2px 4px rgba(5, 5, 5, 0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .search-container {
