@@ -43,10 +43,9 @@ body {
 .store-name {
     font-family: Arial, Helvetica, sans-serif;
   font-size: 1.8rem;
-  font-weight: bolder;
+  font-weight: 700;
   letter-spacing: 1px;
-  background: linear-gradient( var(--light));
-  
+  background: linear-gradient(to right, var(--light), var(--light));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
