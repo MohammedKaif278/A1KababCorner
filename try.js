@@ -1,4 +1,4 @@
-// A1 Kabab Corner Combined Script with WhatsApp Checkout, Cart Persistence, and Accessibility
+// A1 Kabab Corner Combined Script with WhatsApp Checkout, Cart Persistence, Accessibility, and Time-based Ordering
 
 // DOM Elements
 const mainDiv = document.getElementById('main');
@@ -10,6 +10,7 @@ const cartCount = document.getElementById('cartCount');
 const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const filterBtns = document.querySelectorAll('.filter-btn');
+const banner = document.getElementById('statusBanner'); // Add a div with this ID in HTML for banner
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -18,6 +19,37 @@ function init() {
   fetchProducts();
   setupEventListeners();
   updateCart();
+  autoUpdateStatus();
+}
+
+function isRestaurantOpen() {
+  const now = new Date();
+  const hour = now.getHours();
+  return hour >= 15 && hour < 22; // open from 6pM to 10 PM
+}
+
+function updateStatusBanner() {
+  const isOpen = isRestaurantOpen();
+  if (banner) {
+    banner.textContent = isOpen ? "We're Open! Order Now 🍽️" : "Sorry, we're closed. Orders accepted from 6 PM to 10 PM.";
+    banner.style.fontSize="26px"
+    banner.style.color="black"
+    banner.style.textAlign="center"
+
+    banner.className = isOpen ? 'open' : 'closed';
+  }
+
+  const checkoutBtn = document.querySelector('.checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.disabled = !isOpen;
+    checkoutBtn.textContent = isOpen ? 'Checkout' : 'Closed Now';
+    checkoutBtn.classList.toggle('disabled', !isOpen);
+  }
+}
+
+function autoUpdateStatus() {
+  updateStatusBanner();
+  setInterval(updateStatusBanner, 300000); // Every 5 minutes
 }
 
 function fetchProducts() {
@@ -264,44 +296,37 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleCheckout() {
+  if (!isRestaurantOpen()) {
+    alert("We're currently closed. Please order between 11 AM to 11 PM.");
+    return;
+  }
+
   if (!cart.length) return alert('Cart is empty!');
 
   const name = prompt("Enter your name:");
   const phone = prompt("Enter your phone number:");
-  const address = prompt("Enter your delivery address:");
+  const address = prompt("Enter your full delivery address:");
   const notes = document.getElementById("orderNotes")?.value || '';
 
-  // Get Geolocation
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const { latitude, longitude } = position.coords;
-      const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  if (!name || !phone || !address) {
+    alert("Please fill in all required details.");
+    return;
+  }
 
-      // Compose WhatsApp message
-      let msg = `🛒 *A1 Kabab Corner*\n👤 Name: ${name}\n📞 Phone No:${phone}\n🏠 Address: ${address}\n📍 Location: ${locationLink}\n\n`;
+  let msg = ` A1 Kabab Corner Order\n\n Name: ${name}\n Phone: ${phone}\n Address: ${address}\n\n`;
+  cart.forEach(item => {
+    msg += `• ${item.title} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}\n`;
+  });
 
-      cart.forEach(i => {
-        msg += `• ${i.title} x ${i.quantity} = ₹${(i.price * i.quantity).toFixed(2)}\n`;
-      });
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  msg += `\n Notes: ${notes || 'None'}\n Total: ₹${total.toFixed(2)}`;
 
-      msg += `\n📝 Notes: ${notes || 'None'}\n💰 Total: ₹${cart.reduce((t, i) => t + i.price * i.quantity, 0).toFixed(2)}`;
+  const encodedMsg = encodeURIComponent(msg);
+  const whatsappURL = `https://wa.me/918956507490?text=${encodedMsg}`;
+  window.open(whatsappURL, '_blank');
 
-      // Open WhatsApp with message
-      window.open(`https://wa.me/918956507490?text=${encodeURIComponent(msg)}`, '_blank');
-
-      cart.length = 0;
-      updateCart();
-      localStorage.removeItem('cart');
-      alert('Thank you! Order sent via WhatsApp');
-    },
-    (err) => {
-      alert("Location permission denied. Please enable location to proceed.");
-    }
-  );
+  cart.length = 0;
+  updateCart();
+  localStorage.removeItem('cart');
+  alert("Order sent via WhatsApp!");
 }
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('.checkout-btn').addEventListener('click', handleCheckout);
-});

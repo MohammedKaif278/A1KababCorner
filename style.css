@@ -43,13 +43,14 @@ body {
 .store-name {
     font-family: Arial, Helvetica, sans-serif;
   font-size: 1.8rem;
-  font-weight: 700;
+  font-weight: bolder;
   letter-spacing: 1px;
-  background: linear-gradient(to right, var(--light), var(--light));
+  background: linear-gradient(360deg, var(--dark));
+  
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 1px 2px 4px rgba(5, 5, 5, 0.1);
 }
 
 .search-container {
@@ -542,4 +543,23 @@ body {
   resize: vertical;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+
+.status-banner {
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  
+}
+
+.status-open {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-closed {
+  background-color: #f8d7da;
+  color: #721c24;
 }
